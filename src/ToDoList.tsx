@@ -1,5 +1,7 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import React, {ChangeEvent} from 'react';
 import {FilterType} from './App';
+import {AddItemForm} from './AddItemFormType';
+import {EditableSpan} from './EditableSpan';
 
 export type TasksType = {
     id: string
@@ -17,73 +19,54 @@ type ToDoListType = {
     changeStatus: (todolistId: string, id: string, isDone: boolean) => void
     filter: FilterType
     removeTodolist: (todolistId: string) => void
+    changeTaskTitle: (todolistId: string, id: string, title: string) => void
+    changeTodolistTitle: (todolistId: string, title: string) => void
 }
 
 export const ToDoList = (props: ToDoListType) => {
 
-    const [newTaskTitle, setNewTaskTitle] = useState('')
-    const [error, setError] = useState<string | null>(null)
-
-
-    const onClickButtonHandler = () => {
-        if (newTaskTitle.trim()) {
-            props.addTask(props.id, newTaskTitle.trim())
-            setNewTaskTitle('')
-        } else {
-            setError('Title is required')
-        }
-    }
-    const onKeyDownHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        setError(null)
-        if (e.key === 'Enter') {
-            newTaskTitle.trim() && props.addTask(props.id, newTaskTitle.trim())
-            setNewTaskTitle('')
-        }
-    }
-
-    const onChangeInputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setNewTaskTitle(e.currentTarget.value)
-    }
-
     const onAllClickHandler = () => props.changeFilter(props.id, 'all')
     const onActiveClickHandler = () => props.changeFilter(props.id, 'active')
     const onComplitedClickHandler = () => props.changeFilter(props.id, 'completed')
+    const removeTodolist = () => props.removeTodolist(props.id)
 
-    const removeTodolist = () => {
-        props.removeTodolist(props.id)
+
+    const addTask = (title: string) => {
+        props.addTask(props.id, title)
     }
+
+    const сhangeTodolistTitleHandler = (title: string) => {
+        props.changeTodolistTitle(props.id, title)
+    }
+
 
     return (
         <div>
-            <h3>{props.title}
+            <h3>
+                <EditableSpan title={props.title} onChange={сhangeTodolistTitleHandler}/>
                 <button onClick={removeTodolist}>x</button>
             </h3>
-            <div>
-                <input
-                    className={error ? 'error' : ''}
-                    value={newTaskTitle}
-                    onChange={onChangeInputHandler}
-                    onKeyDown={onKeyDownHandler}
-                />
-                <button onClick={onClickButtonHandler}>+</button>
-                {error && <div className={'error-message'}>{error}</div>}
-            </div>
+            <AddItemForm addItem={addTask}/>
+
             <ul>
                 {props.tasks.map(el => {
 
                     const onRemoveHandler = () => props.removeTask(props.id, el.id)
-                    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+                    const onChangeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
 
                         props.changeStatus(props.id, el.id, e.currentTarget.checked)
+                    }
+                    const onChangeTitleHandler = (title: string) => {
+                        props.changeTaskTitle(props.id, el.id, title)
                     }
 
                     return (
                         <li key={el.id} className={el.isDone ? 'is-done' : ''}>
                             <input type="checkbox"
-                                   onChange={onChangeHandler}
+                                   onChange={onChangeStatusHandler}
                                    checked={el.isDone}
                             />
-                            <span>{el.title}</span>
+                            <EditableSpan title={el.title} onChange={onChangeTitleHandler}/>
                             <button onClick={onRemoveHandler}>x</button>
                         </li>
                     )
@@ -109,3 +92,4 @@ export const ToDoList = (props: ToDoListType) => {
         </div>
     );
 }
+
