@@ -33,9 +33,22 @@ export type ChangeTaskStatusACType = {
     id: string,
     isDone: boolean
 }
+let todolistId1 = v1()
+let todolistId2 = v1()
+const initialState: TasksStateType = {
+        // [todolistId1]: [
+        //     {id: v1(), title: "HTML&CSS", isDone: true},
+        //     {id: v1(), title: "JS", isDone: true},
+        //     {id: v1(), title: "ReactJS", isDone: false},
+        //     {id: v1(), title: "Redux", isDone: false},
+        // ],
+        // [todolistId2]: [
+        //     {id: v1(), title: "Book", isDone: false},
+        //     {id: v1(), title: "Milk", isDone: true},
+        // ],
+    }
 
-
-export const tasksReducer = (state: TasksStateType, action: ActionType): TasksStateType => {
+export const tasksReducer = (state: TasksStateType = initialState, action: ActionType): TasksStateType => {
     switch (action.type) {
         case 'REMOVE-TASK': {
             return {...state, [action.todolistId]: state[action.todolistId].filter(el => el.id !== action.id)}
